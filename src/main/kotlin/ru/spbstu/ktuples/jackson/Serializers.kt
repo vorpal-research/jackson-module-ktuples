@@ -36,7 +36,7 @@ private fun <T: Tuple> SimpleModule.addSerializer(clazz: KClass<T>): SimpleModul
 }
 
 // XXX: generate this?
-fun registerSerializers(module: SimpleModule): SimpleModule {
+internal fun registerSerializers(module: SimpleModule): SimpleModule {
     try {
         var i = 0
         while (true) {
