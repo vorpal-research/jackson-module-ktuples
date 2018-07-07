@@ -146,7 +146,7 @@ private fun <T: Tuple> SimpleModule.addDeserializer(clazz: KClass<T>, size: Int)
 }
 
 // XXX: generate this?
-fun registerDeserializers(module: SimpleModule): SimpleModule {
+internal fun registerDeserializers(module: SimpleModule): SimpleModule {
     try {
         var i = 0
         while (true) {
