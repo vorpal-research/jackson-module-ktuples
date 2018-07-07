@@ -9,6 +9,9 @@ import com.fasterxml.jackson.databind.module.SimpleModule
 import ru.spbstu.ktuples.*
 import kotlin.reflect.KClass
 
+private const val INDEX_FIELD = "index"
+private const val VALUE_FIELD = "value"
+
 class EitherDeserializer<T: VariantBase>(val clazz: KClass<T>) : StdDeserializer<T>(clazz.java), ContextualDeserializer {
     override fun createContextual(ctxt: DeserializationContext, property: BeanProperty?): JsonDeserializer<*> {
         val type = ctxt.contextualType ?: property?.type ?: return this
@@ -28,7 +31,7 @@ class EitherDeserializer<T: VariantBase>(val clazz: KClass<T>) : StdDeserializer
             while(token != JsonToken.END_OBJECT) {
                 val field = parser.currentName
                 when (field) {
-                    "value" -> result = codec.readValue(parser, contextualType.containedType(0))
+                    VALUE_FIELD -> result = codec.readValue(parser, contextualType.containedType(0))
                 }
                 token = parser.nextValue()
             }
@@ -51,14 +54,14 @@ class EitherDeserializer<T: VariantBase>(val clazz: KClass<T>) : StdDeserializer
             while(token != JsonToken.END_OBJECT) {
                 val field = parser.currentName
                 when (field) {
-                    "index" -> {
+                    INDEX_FIELD -> {
                         require(parser.currentToken == JsonToken.VALUE_NUMBER_INT || parser.currentToken == JsonToken.VALUE_NUMBER_FLOAT)
                         index = parser.intValue
                         if (value != null) {
                             result = readClassContents(index, codec.treeAsTokens(value))
                         }
                     }
-                    "value" -> {
+                    VALUE_FIELD -> {
                         when (index) {
                             null -> {
                                 value = codec.readTree(parser)
