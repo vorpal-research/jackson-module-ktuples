@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
+import ru.spbstu.ktuples.KTuplesSummary
 import ru.spbstu.ktuples.Tuple
 import ru.spbstu.ktuples.VariantBase
 import kotlin.reflect.KClass
@@ -35,17 +36,10 @@ private fun <T: Tuple> SimpleModule.addSerializer(clazz: KClass<T>): SimpleModul
     return addSerializer(clazz.java, TupleSerializer(clazz))
 }
 
-// XXX: generate this?
 internal fun registerSerializers(module: SimpleModule): SimpleModule {
-    try {
-        var i = 0
-        while (true) {
-            module.addSerializer(Class.forName("ru.spbstu.ktuples.Tuple$i").kotlin as KClass<out Tuple>)
-            module.addSerializer(Class.forName("ru.spbstu.ktuples.Variant$i").kotlin as KClass<out VariantBase>)
-            module.addSerializer(Class.forName("ru.spbstu.ktuples.EitherOf${i + 2}").kotlin as KClass<out VariantBase>)
-            ++i
-        }
-    } catch (nf: ClassNotFoundException) {}
+    KTuplesSummary.tupleClasses.forEach { module.addSerializer(it) }
+    KTuplesSummary.variantClasses.forEach { module.addSerializer(it) }
+    KTuplesSummary.eitherClasses.forEach { module.addSerializer(it) }
 
     return module
 }

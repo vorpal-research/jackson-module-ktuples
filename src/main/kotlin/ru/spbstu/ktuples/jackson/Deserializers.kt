@@ -73,8 +73,8 @@ class EitherDeserializer<T: VariantBase>(val clazz: KClass<T>) : StdDeserializer
                 token = parser.nextValue()
             }
 
-            result ?: throw IllegalArgumentException("EitherOf2 with no index or value field")
-            index ?: throw IllegalArgumentException("EitherOf2 with no index or value field")
+            result ?: throw IllegalArgumentException("Either with no index or value field")
+            index ?: throw IllegalArgumentException("Either with no index or value field")
             @Suppress("UNCHECKED_CAST")
             return Variant(index, result) as T
         }
@@ -91,7 +91,7 @@ class EitherDeserializer<T: VariantBase>(val clazz: KClass<T>) : StdDeserializer
     }
 
     override fun deserialize(p: JsonParser, ctxt: DeserializationContext): T {
-        throw IllegalStateException("TupleDeserializer cannot parse types without type information =(")
+        throw IllegalStateException("EitherDeserializer cannot parse types without type information =(")
     }
 }
 
@@ -145,17 +145,10 @@ private fun <T: Tuple> SimpleModule.addDeserializer(clazz: KClass<T>, size: Int)
     return addDeserializer(clazz.java, TupleDeserializer(clazz, size))
 }
 
-// XXX: generate this?
 internal fun registerDeserializers(module: SimpleModule): SimpleModule {
-    try {
-        var i = 0
-        while (true) {
-            module.addDeserializer(Class.forName("ru.spbstu.ktuples.Tuple$i").kotlin as KClass<out Tuple>, i)
-            module.addDeserializer(Class.forName("ru.spbstu.ktuples.Variant$i").kotlin as KClass<out VariantBase>)
-            module.addDeserializer(Class.forName("ru.spbstu.ktuples.EitherOf${i + 2}").kotlin as KClass<out VariantBase>)
-            ++i
-        }
-    } catch (nf: ClassNotFoundException) {}
+    KTuplesSummary.tupleClasses.forEachIndexed { i, it -> module.addDeserializer(it, i) }
+    KTuplesSummary.variantClasses.forEach { module.addDeserializer(it) }
+    KTuplesSummary.eitherClasses.forEach { module.addDeserializer(it) }
 
     return module
 }
