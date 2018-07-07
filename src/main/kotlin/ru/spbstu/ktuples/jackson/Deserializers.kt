@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.module.SimpleModule
 import ru.spbstu.ktuples.*
 import kotlin.reflect.KClass
-import kotlin.reflect.full.primaryConstructor
 
 class EitherDeserializer<T: VariantBase>(val clazz: KClass<T>) : StdDeserializer<T>(clazz.java), ContextualDeserializer {
     override fun createContextual(ctxt: DeserializationContext, property: BeanProperty?): JsonDeserializer<*> {
@@ -33,7 +32,7 @@ class EitherDeserializer<T: VariantBase>(val clazz: KClass<T>) : StdDeserializer
                 }
                 token = parser.nextValue()
             }
-            return checkNotNull(clazz.primaryConstructor).call(result)
+            return clazz.java.getConstructor(Any::class.java).newInstance(result)
         }
     }
 
