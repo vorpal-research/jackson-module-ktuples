@@ -12,9 +12,9 @@ import kotlin.reflect.KClass
 class EitherSerializer<T: VariantBase>(clazz: KClass<T>) : StdSerializer<T>(clazz.java) {
     override fun serialize(value: T, gen: JsonGenerator, provider: SerializerProvider) {
         gen.writeStartObject()
-        gen.writeFieldName("index")
+        gen.writeFieldName(INDEX_FIELD)
         gen.writeObject(value.index)
-        gen.writeFieldName("value")
+        gen.writeFieldName(VALUE_FIELD)
         gen.writeObject(value.value)
         gen.writeEndObject()
     }

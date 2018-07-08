@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import org.testng.annotations.Test
 import ru.spbstu.ktuples.Tuple
-import ru.spbstu.ktuples.Tuple2
-import ru.spbstu.ktuples.Tuple3
 import kotlin.test.assertEquals
 
 class CrossTest {

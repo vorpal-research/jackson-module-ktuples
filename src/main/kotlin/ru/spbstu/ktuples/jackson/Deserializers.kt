@@ -9,9 +9,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule
 import ru.spbstu.ktuples.*
 import kotlin.reflect.KClass
 
-private const val INDEX_FIELD = "index"
-private const val VALUE_FIELD = "value"
-
 class EitherDeserializer<T: VariantBase>(val clazz: KClass<T>) : StdDeserializer<T>(clazz.java), ContextualDeserializer {
     override fun createContextual(ctxt: DeserializationContext, property: BeanProperty?): JsonDeserializer<*> {
         val type = ctxt.contextualType ?: property?.type ?: return this
@@ -83,11 +80,12 @@ class EitherDeserializer<T: VariantBase>(val clazz: KClass<T>) : StdDeserializer
 
         private fun readClassContents(index: Int, parser: JsonParser): Any? {
             val codec = parser.codec
+            val arity = contextualType.containedTypeCount()
             return when(index) {
-                in (0 until contextualType.containedTypeCount()) ->
+                in (0 until arity) ->
                     codec.readValue(parser, contextualType.containedType(index)) as Any?
                 else ->
-                    throw IllegalArgumentException("Index out of bounds: $index for EitherOf2")
+                    throw IllegalArgumentException("Index out of bounds: $index for EitherOf$arity")
             }
         }
     }
